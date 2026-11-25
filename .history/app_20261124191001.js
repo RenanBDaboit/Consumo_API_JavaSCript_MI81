@@ -1,0 +1,167 @@
+const API_URL = 'https://dynamic-events-api.onrender.com/api';
+
+
+async function listar() {
+    try {
+        let listaPosts = await fetch(API_URL);
+
+        if (!listaPosts.ok) {
+            throw new Error('Erro ao listar');
+        }
+
+        let listaPostsConvertido = await listaPosts.json();
+
+        return listaPostsConvertido;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function buscar(id) {
+    try {
+        let postBuscado = await fetch(`${API_URL}/${id}`);
+
+        if (!postBuscado.ok) {
+            throw new Error('Post não encontrado');
+        }
+
+        let postConvertido = await postBuscado.json();
+
+        return postConvertido;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function cadastrar(post) {
+    const resposta = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(post)
+    });
+
+    if (!resposta.ok) {
+        throw new Error('Erro ao cadastrar');
+    }
+
+    const respostaConvertida = await resposta.json();
+
+    return respostaConvertida;
+}
+
+async function atualizar(id, post) {
+    const resposta = await fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(post)
+    });
+
+    if (!resposta.ok) {
+        throw new Error('Erro ao atualizar');
+    }
+
+    const respostaConvertida = await resposta.json();
+
+    return respostaConvertida;
+}
+
+async function deletar(id) {
+    const resposta = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE"
+    });
+
+    if (!resposta.ok) {
+        throw new Error('Erro ao deletar');
+    }
+
+    if (resposta.status === 204) {
+        return;
+    }
+
+    const texto = await resposta.text();
+
+    if (!texto) {
+        return;
+    }
+
+    return JSON.parse(texto);
+}
+
+async function carregarCursos() {
+    const listaProgramas = document.getElementById('listaProgramas');
+
+    const lista = await listar();
+
+    lista.forEach(programa => {
+        const card = document.createElement('article');
+        card.classList.add('program-card');
+        
+        const divImagem = document.createElement('div');
+        divImagem.classList.add('program-card__image-wrap');
+
+        const img = document.createElement('img');
+        img.classList.add('program-card__image');
+        img.src = programa.imagem;
+        img.alt = '';
+
+        divImagem.appendChild(img);
+
+        const divBody = document.createElement('div');
+        divBody.classList.add('program-card__body');
+
+        const divMeta = document.createElement('div');
+        divMeta.classList.add('program-card__meta');
+
+        const categoria = document.createElement('span');
+        categoria.classList.add('badge');
+        categoria.textContent = programa.categoria;
+        
+        divMeta.appendChild(categoria);
+
+        if (programa.destaque == true) {
+            const destaque = document.createElement('span');
+            destaque.classList.add('badge--primary');
+            destaque.textContent = 'Destaque';
+            divMeta.appendChild(destaque);
+        }
+
+        divBody.appendChild(divMeta);
+
+        const titulo = document.createElement('h3');
+        titulo.textContent = programa.nome;
+        divBody.appendChild(titulo);
+
+        const descricao = document.createElement('p');
+        descricao.textContent = programa.descricao;
+        divBody.appendChild(descricao);
+
+        const divDetails = document.createElement('div');
+        divDetails.classList.add('program-card__details');
+
+        const data = document.createElement('span');
+        data.textContent = Intl.DateTimeFormat('pt-BR', programa.data);
+
+        divDetails.appendChild(data);
+
+        const local = document.createElement('span');
+        local.textContent = programa.local;
+
+        divDetails.appendChild(local);
+
+        divBody.appendChild(divDetails);
+
+        const divFooter = document.createElement('div');
+        divFooter.classList.add('program-card__footer');
+
+        const preco = document.createElement('strong');
+        preco.textContent = `R$ ${programa.preco}`;
+
+        divFooter.appendChild(preco);
+
+        const vagas = document.cre
+    });
+}
